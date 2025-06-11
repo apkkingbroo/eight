@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Prediction System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #0a0a0a;
+      overflow: hidden;
+    }
+    .iframe-container {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .floating-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #20232a;
+      color: white;
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+      text-align: center;
+      font-size: 16px;
+      font-weight: 600;
+      z-index: 10;
+      cursor: move;
+      min-width: 250px;
+    }
+    .floating-box h3 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #ffd369;
+    }
+    .prediction-value {
+      font-size: 22px;
+      font-weight: bold;
+      padding: 6px 0;
+      color: #00f5d4;
+      background: #121212;
+      border-radius: 10px;
+      margin-top: 10px;
+      box-shadow: 0 0 8px #00f5d4;
+    }
+    .big {
+      animation: blink 1s infinite;
+    }
+    .small {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    #telegramIcon {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      background: #1d1f27;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
+      cursor: move;
+      z-index: 30;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    #telegramIcon img {
+      width: 22px;
+      height: 22px;
+      margin-right: 10px;
+    }
+    .popup {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #161616;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      z-index: 25;
+    }
+    .popup img {
+      width: 22px;
+      margin-right: 10px;
+    }
+    .popup span {
+      font-size: 14px;
+    }
+    .popup button {
+      margin-left: 15px;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 8px;
+      background: #00d4ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="iframe-container">
+    <iframe src="https://82lottery9.com/#/register?invitationCode=14244992621"></iframe>
+  </div>
+
+  <!-- Telegram Join Floating Label -->
+  <div id="telegramIcon">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram"/>
+    @apkmodderkings
+  </div>
+
+  <!-- Floating Prediction Box -->
+  <div class="floating-box" id="floatingBox">
+    <h3 id="periodNumber">Period: Loading...</h3>
+    <div id="timerText">00:00</div>
+    <div class="prediction-value" id="resultText">BIG</div>
+  </div>
+
+  <!-- Popup Join Dialog -->
+  <div class="popup" id="popup">
+    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="TG"/>
+    <span>Join our Telegram channel</span>
+    <button onclick="joinTelegram()">Join</button>
+  </div>
+
+  <script>
+    function joinTelegram() {
+      window.open("https://telegram.me/apkmodderkings", "_blank");
+      document.getElementById("popup").style.display = "none";
+    }
+
+    let lastSecond = -1, currentResult = "BIG";
+    function updatePeriodAndTimer() {
+      const now = new Date();
+      const y = now.getUTCFullYear();
+      const m = now.getUTCMonth() + 1;
+      const d = now.getUTCDate();
+      const h = now.getUTCHours();
+      const min = now.getUTCMinutes();
+      const sec = now.getUTCSeconds();
+      const periodNum = `${y}${String(m).padStart(2, '0')}${String(d).padStart(2, '0')}1000${10001 + h * 60 + min}`;
+      document.getElementById("periodNumber").innerText = "Period: " + periodNum;
+      document.getElementById("timerText").innerText = `00:${String(59 - sec).padStart(2, '0')}`;
+      if (sec === 59 && lastSecond !== sec) {
+        currentResult = Math.random() > 0.5 ? "BIG" : "SMALL";
+        const resultText = document.getElementById("resultText");
+        resultText.innerText = currentResult;
+        resultText.className = "prediction-value " + (currentResult === "BIG" ? "big" : "small");
+      }
+      lastSecond = sec;
+    }
+    setInterval(updatePeriodAndTimer, 1000);
+    updatePeriodAndTimer();
+
+    function makeMovable(el) {
+      let isDragging = false, offsetX, offsetY;
+
+      el.addEventListener("mousedown", function(e) {
+        isDragging = true;
+        offsetX = e.clientX - el.offsetLeft;
+        offsetY = e.clientY - el.offsetTop;
+        e.preventDefault();
+      });
+
+      document.addEventListener("mousemove", function(e) {
+        if (isDragging) {
+          el.style.left = e.clientX - offsetX + "px";
+          el.style.top = e.clientY - offsetY + "px";
+          el.style.transform = "none";
+        }
+      });
+
+      document.addEventListener("mouseup", function() {
+        isDragging = false;
+      });
+
+      el.addEventListener("touchstart", function(e) {
+        const touch = e.touches[0];
+        offsetX = touch.clientX - el.offsetLeft;
+        offsetY = touch.clientY - el.offsetTop;
+        isDragging = true;
+      });
+
+      document.addEventListener("touchmove", function(e) {
+        if (isDragging && e.touches.length > 0) {
+          const touch = e.touches[0];
+          el.style.left = touch.clientX - offsetX + "px";
+          el.style.top = touch.clientY - offsetY + "px";
+          el.style.transform = "none";
+        }
+      });
+
+      document.addEventListener("touchend", function() {
+        isDragging = false;
+      });
+    }
+
+    makeMovable(document.getElementById("floatingBox"));
+    makeMovable(document.getElementById("telegramIcon"));
+
+    // Prevent swipe refresh on mobile
+    document.body.addEventListener('touchmove', function(e) {
+      if (e.touches.length > 1) return;
+      e.preventDefault();
+    }, { passive: false });
+  </script>
+</body>
+</html>
